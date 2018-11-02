@@ -1,10 +1,10 @@
 {
-  "name": "pug",
+  "name": "autotest-node",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "nyc -a --reporter=clover mocha --recursive"
+    "test": "nyc -a --reporter=clover mocha --recursive && nyc report"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
@@ -15,6 +15,8 @@
     "pug": "2.0.0-beta11"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
     "mocha": "^5.2.0",
     "nyc": "^13.0.1"
   }
