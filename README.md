@@ -93,9 +93,9 @@ calc.minus = function(x,y){
 }
 module.exports = calc;
 ```
-修改test.js。
+新建calc.spec.js。
 ```js
-//test/test.js
+//test/calc.spec.js
 var assert = require('assert');
 var calc = require('../calc');
 
@@ -116,9 +116,9 @@ All files |    83.33 |      100 |       50 |    83.33 |                   |
  calc.js  |    83.33 |      100 |       50 |    83.33 |                 6 |
 ----------|----------|----------|----------|----------|-------------------|
 ```
-修改test.js，添加测试用例。
+修改calc.spec.js，添加测试用例。
 ```js
-//test/test.js
+//test/calc.spec.js
 var assert = require('assert');
 var calc = require('../calc');
 
