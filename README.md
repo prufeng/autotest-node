@@ -58,7 +58,7 @@ $ npm i -D nyc
   }
 }
 ```
-运行`npm test`，等结果如下：
+运行`npm test`，得结果如下：
 ```bash
 > nyc mocha --timeout=3000
 
