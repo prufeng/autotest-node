@@ -13,7 +13,8 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(require('express-bunyan-logger')(require('./demo/bunyan').express));
+require('./demo/bunyan').connectLogger(app);
+require('./demo/log4js').connectLogger(app,'http');
 
 app.use(logger('dev'));
 app.use(express.json());
