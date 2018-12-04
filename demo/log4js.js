@@ -51,14 +51,39 @@ log4js.configure({
     }
 });
 
-function getLogger(category) {
+function _getLogger(category) {
     let logger = log4js.getLogger(category || 'default');
     logger.addContext('user', 'system');//inject default user
     return logger;
 }
 
+function _setUserNo2Logger(log) {
+    return function (req, res, next) {
+        const userId = req.userId;
+        if (userId) {
+            log.addContext('user', userId);
+        }
+        log.debug('Call LoggerContextInjector.setUserNo2Logger(%s)', userId);
+        next();
+    };
+}
+
+function _setUserNo(router, log) {
+    router.get('*', _setUserNo2Logger(log), function (req, res, next) {
+        next();
+    });
+}
+
+function getLogger(category, router=undefined){
+    let logger = _getLogger(category);
+    if(router){
+        _setUserNo(router, logger);
+    }
+    return logger;
+}
+
 function connectLogger(app, category) {
-    app.use(log4js.connectLogger(getLogger(category), { level: 'auto' }));
+    app.use(log4js.connectLogger(_getLogger(category), { level: 'auto' }));
 }
 
 module.exports = { getLogger, connectLogger };
