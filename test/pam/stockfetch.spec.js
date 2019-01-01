@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 var sinon = require('sinon');
 var fs = require('fs');
 var StockFetch = require('../../pam/stockfetch')
-describe('Stock fetch tests', () => {
+describe('StockFetch tests', () => {
     var stockfetch;
 
     beforeEach(() => {
@@ -33,19 +33,32 @@ describe('Stock fetch tests', () => {
         var rawData = '601169\n002146\n601009'
         var parsedData = ['601169', '002146', '601009'];
 
-        var stubFs = sinon.stub(fs, 'readFile');
-        stubFs.callsFake(function(fileName, callback){
+        sinon.stub(fs, 'readFile').callsFake(function(fileName, callback){
             callback(null, rawData);
         });
     
-        var stubPt = sinon.stub(stockfetch, 'parseTickers').withArgs(rawData).returns(parsedData);    
+        sinon.stub(stockfetch, 'parseTickers').withArgs(rawData).returns(parsedData);    
 
-        var stubProt = sinon.stub(stockfetch, 'processTickers').callsFake(function(data){
+        sinon.stub(stockfetch, 'processTickers').callsFake(function(data){
             expect(data).to.be.eql(parsedData);
             done();
         });
 
-        stockfetch.readTickerFile('pam/validFile.csv', function(err){throw new Error(err);});
+        stockfetch.readTickerFile('validFile', function(err){throw new Error(err);});
     });
+
+    it('read should return error if given file is empty', function(done){
+        var onError = function(err){
+            expect(err).to.be.eql('File emptyFile has invalid content');
+            done();
+        };
+
+        sinon.stub(stockfetch, 'parseTickers').withArgs('').returns([]);
+        sinon.stub(fs, 'readFile').callsFake(function(fileName, callback){
+            callback(null, '');
+        });
+
+        stockfetch.readTickerFile('emptyFile', onError);
+    })
 
 });

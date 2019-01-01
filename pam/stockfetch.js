@@ -5,12 +5,16 @@ var StockFetch = function () {
     this.readTickerFile = function(fileName, onError) {
         var self = this;
         var processResponse = function(err, data){
-            console.log('Start to processResponse');
+            // console.log('Start to processResponse');
             if(err){
                 onError('Error reading file: ' + fileName);
             }else{
                 var tickers = self.parseTickers(data.toString());
-                self.processTickers(tickers);
+                if(tickers.length === 0){
+                    onError('File ' + fileName + ' has invalid content');
+                }else{
+                    self.processTickers(tickers);
+                }
             }
         }
         fs.readFile(fileName, processResponse);
