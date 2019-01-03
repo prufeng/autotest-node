@@ -16,20 +16,23 @@ var StockFetch = function () {
                     self.processTickers(tickers);
                 }
             }
-        }
+        };
         fs.readFile(fileName, processResponse);
         
-    }
+    };
 
-    this.parseTickers = function() {
-        console.log('Start to parseTickers');
+    this.parseTickers = function(content) {
+        // console.log('Start to parseTickers');
+        const isInRightFormat = function(str){
+            return str.trim().length===6 && str.indexOf(' ')<0;
+        };
+        return content.split('\n').filter(isInRightFormat);
+    };
 
-    }
-
-    this.processTickers = function() {
+    this.processTickers = function(tickers) {
         console.log('Start to processTickers');
 
-    }
+    };
 
 
 };
