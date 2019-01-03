@@ -1,12 +1,13 @@
 var expect = require('chai').expect;
+var assert = require('chai').assert;
 var sinon = require('sinon');
 var fs = require('fs');
-var StockFetch = require('../../pam/stockfetch')
+var StockFetch = require('../../pam/stockFetch')
 describe('StockFetch tests', () => {
-    var stockfetch;
+    var stockFetch;
 
     beforeEach(() => {
-        stockfetch = new StockFetch();
+        stockFetch = new StockFetch();
     });
 
     afterEach(() => {
@@ -14,22 +15,23 @@ describe('StockFetch tests', () => {
     });
 
     it('should pass this canary test', () => {
-        expect(true).to.be.true;
+        assert(true);
     });
 
     it('read should invoke error handler for invalid file', function (done) {
         var onError = function (err) {
-            expect(err).to.be.eql('Error reading file: invalidFile');
+            expect(err).to.be.eql('Error reading file: dummyInvalidFile');
             done();
-        }
+        };
         var stub = sinon.stub(fs, 'readFile');
-        stub.yields(new Error('Failed to read file'));
+        // stub.yields(new Error('Failed to read file'));
+        stub.callsArgWith(1, new Error('Failed to read file'));
         
-        stockfetch.readTickerFile('invalidFile', onError);
+        stockFetch.readTickerFile('dummyInvalidFile', onError);
         stub.restore();
     });
 
-    it('read should invoke processTickers for valid file', function (done) {
+    it('read should invoke processTickers for valid file', function () {
         var rawData = '601169\n002146\n601009'
         var parsedData = ['601169', '002146', '601009'];
 
@@ -37,28 +39,42 @@ describe('StockFetch tests', () => {
             callback(null, rawData);
         });
     
-        sinon.stub(stockfetch, 'parseTickers').withArgs(rawData).returns(parsedData);    
+        sinon.stub(stockFetch, 'parseTickers').withArgs(rawData).returns(parsedData);    
 
-        sinon.stub(stockfetch, 'processTickers').callsFake(function(data){
+        sinon.stub(stockFetch, 'processTickers').callsFake(function(data){
             expect(data).to.be.eql(parsedData);
-            done();
         });
 
-        stockfetch.readTickerFile('validFile', function(err){throw new Error(err);});
+        stockFetch.readTickerFile('dummyValidFile', function(err){throw new Error(err);});
     });
 
     it('read should return error if given file is empty', function(done){
         var onError = function(err){
-            expect(err).to.be.eql('File emptyFile has invalid content');
+            expect(err).to.be.eql('File dummyEmptyFile has invalid content');
             done();
         };
 
-        sinon.stub(stockfetch, 'parseTickers').withArgs('').returns([]);
+        sinon.stub(stockFetch, 'parseTickers').withArgs('').returns([]);
         sinon.stub(fs, 'readFile').callsFake(function(fileName, callback){
             callback(null, '');
         });
 
-        stockfetch.readTickerFile('emptyFile', onError);
-    })
+        stockFetch.readTickerFile('dummyEmptyFile', onError);
+    });
 
+    it('parseTickers should return tickers', function(){
+        expect(stockFetch.parseTickers('601169\n002146\n601009\n')).to.be.eql(['601169', '002146', '601009']);
+    });
+
+    it('parseTickers should return empty array for empty content', function(){
+        expect(stockFetch.parseTickers('')).to.be.eql([]);
+    });
+
+    it('parseTickers should return empty array for white-space', function(){
+        expect(stockFetch.parseTickers(' ')).to.be.eql([]);
+    });
+
+    it('parseTickers should ignore unexpected format in content', function(){
+        expect(stockFetch.parseTickers('6011699\n601169 \n002 46\n601009\n\n')).to.be.eql(['601009']);
+    });
 });
