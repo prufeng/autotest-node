@@ -29,10 +29,19 @@ var StockFetch = function () {
         return content.split('\n').filter(isInRightFormat);
     };
 
+    this.tickersCount = 0;
     this.processTickers = function(tickers) {
-        console.log('Start to processTickers');
-
+        // console.log('Start to processTickers');
+        const self = this;
+        self.tickersCount = tickers.length;
+        tickers.forEach(ticker=>{
+            self.getPrice(ticker);
+        });
     };
+
+    this.getPrice = function(ticker){
+
+    }
 
 
 };

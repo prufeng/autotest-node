@@ -77,4 +77,23 @@ describe('StockFetch tests', () => {
     it('parseTickers should ignore unexpected format in content', function(){
         expect(stockFetch.parseTickers('6011699\n601169 \n002 46\n601009\n\n')).to.be.eql(['601009']);
     });
+
+
+    it('processTickers should call getPrice for each ticker symbol', function(){
+        const stockFetchMock = sinon.mock(stockFetch);
+        stockFetchMock.expects('getPrice').withArgs('601169');
+        stockFetchMock.expects('getPrice').withArgs('002146');
+        stockFetchMock.expects('getPrice').withArgs('601009');
+        
+        stockFetch.processTickers(['601169', '002146', '601009']);
+        stockFetchMock.verify();
+    });
+
+    it('processTickers should return tickers count', function(){
+        sinon.stub(stockFetch, 'getPrice');
+
+        stockFetch.processTickers(['601169', '002146', '601009']);
+        expect(stockFetch.tickersCount).to.be.eql(3);
+    });
+
 });
