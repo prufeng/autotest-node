@@ -1,4 +1,5 @@
 var fs = require('fs');
+var http = require('http');
 
 var StockFetch = function () {
 
@@ -39,11 +40,31 @@ var StockFetch = function () {
         });
     };
 
+    this.url = 'http://hq.sinajs.cn/list=';
+    this.getSrcUrl = function(ticker){
+        let startChar = ticker.substr(0,1);
+        if('6'===startChar){
+            startChar='sh';
+        }else if('0'===startChar){
+            startChar='sz';
+        }else{
+            startChar='';
+        }
+        return this.url+startChar+ticker;
+    };
+
+    
+    this.http = http;
     this.getPrice = function(ticker){
+        this.http.get(this.getSrcUrl(ticker), this.processResponse.bind(this, ticker))
+        .on('error', this.processHttpError.bind(this, ticker));
+    };
 
-    }
+    this.processResponse = function(stockFetch, symbol){
 
+    };
 
+    this.processHttpError = function(stockFetch, symbol){};
 };
 
 module.exports = StockFetch;

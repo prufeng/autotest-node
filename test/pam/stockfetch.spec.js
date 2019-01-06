@@ -96,4 +96,47 @@ describe('StockFetch tests', () => {
         expect(stockFetch.tickersCount).to.be.eql(3);
     });
 
+    it('getSrcUrl should return the full URL', function(){
+        expect(stockFetch.getSrcUrl('000001')).to.be.eql(stockFetch.url+'sz000001');
+        expect(stockFetch.getSrcUrl('600001')).to.be.eql(stockFetch.url+'sh600001');
+        expect(stockFetch.getSrcUrl('300001')).to.be.eql(stockFetch.url+'300001');
+    });
+    
+    it('getPrice should call get on http with valid URL', function(done){
+        const stub = sinon.stub(stockFetch.http, 'get').callsFake(function(url){
+            expect(url).to.be.eql('http://hq.sinajs.cn/list=sz000001');
+            done();
+        });
+        stockFetch.getPrice('000001');
+    });
+
+    it('getPrice should send a response handler to get', function(done){
+        const aHandler = function(){};
+
+        sinon.stub(stockFetch.processResponse, 'bind').withArgs(stockFetch, '000001').returns(aHandler);
+
+        sinon.stub(stockFetch.http, 'get').callsFake(function(url, handler){
+            expect(handler).to.be.eql(aHandler);
+            done();
+
+        });
+
+        stockFetch.getPrice('000001');
+    });
+
+    it('getPrice should register handler for failure to reach host', function(done){
+        const errorHandler = function(){};
+
+        sinon.stub(stockFetch.processHttpError, 'bind').withArgs(stockFetch, '000001').returns(errorHandler);
+
+        const onStub = function(event, handler){
+            expect(event).to.be.eql('error');
+            expect(handler).to.be.eql(errorHandler);
+            done();
+        }
+
+        sinon.stub(stockFetch.http, 'get').returns({on: onStub});
+
+        stockFetch.getPrice('000001');
+    });
 });
