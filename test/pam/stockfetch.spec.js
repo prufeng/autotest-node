@@ -137,6 +137,54 @@ describe('StockFetch tests', () => {
 
         sinon.stub(stockFetch.http, 'get').returns({on: onStub});
 
-        stockFetch.getPrice('000001');
+        stockFetch.getPrice('000001');;
+    });
+ 
+    it('processResponse should call parsePrice with valid data', function(){
+        let dataFn;
+        let endFn;
+
+        let response = {
+            statusCode: 200,
+            on: function(event, handler){
+                if(event==='data'){
+                    dataFn = handler;
+                }
+                if(event ==='end'){
+                    endFn = handler;
+                }
+            }
+        };
+
+        let parsePriceMock = sinon.mock(stockFetch).expects('parsePrice').withArgs('000001', 'some data');
+
+        stockFetch.processResponse('000001', response);
+        dataFn('some ');
+        dataFn('data');
+        endFn();
+
+        parsePriceMock.verify();
+    });
+
+    it('processResponse should call processError if response failed', function(){
+        let response = {statusCode: 404};
+
+        let processErrorMock = sinon.mock(stockFetch).expects('processError').withArgs('000001', 404);
+
+        stockFetch.processResponse('000001', response);
+        processErrorMock.verify();
+    });
+
+    
+    it('processResponse should call processError only if response failed', function(){
+        let response = {
+            statusCode: 200,
+            on: function(){}
+        };
+
+        let processErrorMock = sinon.mock(stockFetch).expects('processError').never();
+
+        stockFetch.processResponse('000001', response);
+        processErrorMock.verify();
     });
 });

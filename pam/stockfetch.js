@@ -60,7 +60,23 @@ var StockFetch = function () {
         .on('error', this.processHttpError.bind(this, ticker));
     };
 
-    this.processResponse = function(stockFetch, symbol){
+    this.processResponse = function(symbol, response){
+        var self = this;
+
+        if(response.statusCode === 200){
+            let data = '';
+            response.on('data', function(chunk){data += chunk;});
+            response.on('end', function(){self.parsePrice(symbol, data);});
+        }else{
+            self.processError(symbol, response.statusCode);
+        }
+    };
+
+    this.parsePrice = function(){
+
+    };
+
+    this.processError = function(){
 
     };
 
