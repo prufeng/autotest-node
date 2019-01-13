@@ -72,7 +72,12 @@ var StockFetch = function () {
         }
     };
 
-    this.parsePrice = function(){
+    this.prices = {};
+    this.parsePrice = function(symbol, data){
+        console.log('test');
+        console.log(data);
+        const price = data.split('=')[1].split(',')[3];  
+        this.prices[symbol] = price;
 
     };
 
@@ -80,7 +85,9 @@ var StockFetch = function () {
 
     };
 
-    this.processHttpError = function(stockFetch, symbol){};
+    this.processHttpError = function(symbol, error){
+        this.processError(symbol, error.code);
+    };
 };
 
 module.exports = StockFetch;

@@ -187,4 +187,19 @@ describe('StockFetch tests', () => {
         stockFetch.processResponse('000001', response);
         processErrorMock.verify();
     });
+
+    it('processHttpError should call processError with error details', function(){
+        let processErrorMock = sinon.mock(stockFetch).expects('processError').withArgs('000001','...error code...');
+        
+        let error = {code: '...error code...'};
+        stockFetch.processHttpError('000001', error);
+        processErrorMock.verify();
+    });
+    
+    it('parsePrice should update prices', function(){
+        const data = 'var hq_str_sz000001="平安银行,10.110,10.100,10.200,10.220,10.050,10.190,10.200,69636455,708001802.170,238400,10.190,218458,10.180,155700,10.170,81500,10.160,87500,10.150,809154,10.200,659000,10.210,1128800,10.220,518989,10.230,687000,10.240,2019-01-11,15:05:03,00";';
+        stockFetch.parsePrice('sz000001', data);
+        
+        // expect(stockFetch.prices.sz000001).to.be.eql('10.100');
+    })
 });
