@@ -88,6 +88,16 @@ describe('StockFetch tests', () => {
         stockFetch.processTickers(['601169', '002146', '601009']);
         stockFetchMock.verify();
     });
+    
+    it('processTickers should call getPrice for each ticker symbol by sequence', function(){
+        const stockFetchSpy = sinon.spy(stockFetch, 'getPrice');
+               
+        stockFetch.processTickers(['601169', '002146', '601009']);
+
+        expect(stockFetchSpy.firstCall.calledWithExactly('601169')).to.be.true;
+        expect(stockFetchSpy.secondCall.calledWithExactly('002146')).to.be.true;
+        expect(stockFetchSpy.thirdCall.calledWithExactly('601009')).to.be.true;
+    });
 
     it('processTickers should return tickers count', function(){
         sinon.stub(stockFetch, 'getPrice');
